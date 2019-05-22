@@ -23,7 +23,7 @@ with open("./bright64.bin", "rb") as f:
 print('obrada\n')
 i = 0
 b = []
-with open("./output.bin", "rb") as f:
+with open("./output1.bin", "rb") as f:
 	byte = f.read(1)
 	print(repr(byte))
 	print('\n')
@@ -38,6 +38,8 @@ with open("./output.bin", "rb") as f:
 			print('\n')
 
 
+print(a[0:5])
+print(b[0:5])
 
 c = numpy.array(a)-numpy.array(b)
 
