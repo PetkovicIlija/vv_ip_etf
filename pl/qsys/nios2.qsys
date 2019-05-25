@@ -29,7 +29,7 @@
    {
       datum baseAddress
       {
-         value = "67113088";
+         value = "67113168";
          type = "String";
       }
    }
@@ -45,7 +45,7 @@
    {
       datum baseAddress
       {
-         value = "67113120";
+         value = "67113184";
          type = "String";
       }
    }
@@ -65,6 +65,22 @@
          type = "String";
       }
    }
+   element performance_counter
+   {
+      datum _sortIndex
+      {
+         value = "8";
+         type = "int";
+      }
+   }
+   element performance_counter.control_slave
+   {
+      datum baseAddress
+      {
+         value = "67112960";
+         type = "String";
+      }
+   }
    element pll
    {
       datum _sortIndex
@@ -77,7 +93,7 @@
    {
       datum baseAddress
       {
-         value = "67113104";
+         value = "67113152";
          type = "String";
       }
    }
@@ -109,7 +125,7 @@
    {
       datum baseAddress
       {
-         value = "67113024";
+         value = "67113088";
          type = "String";
       }
    }
@@ -125,7 +141,7 @@
    {
       datum baseAddress
       {
-         value = "67112960";
+         value = "67113024";
          type = "String";
       }
    }
@@ -212,7 +228,7 @@
   <parameter name="dataAddrWidth" value="27" />
   <parameter name="dataMasterHighPerformanceAddrWidth" value="1" />
   <parameter name="dataMasterHighPerformanceMapParam" value="" />
-  <parameter name="dataSlaveMapParam"><![CDATA[<address-map><slave name='sdram.s1' start='0x2000000' end='0x4000000' type='altera_avalon_new_sdram_controller.s1' /><slave name='nios2.debug_mem_slave' start='0x4000800' end='0x4001000' type='altera_nios2_gen2.debug_mem_slave' /><slave name='sgdma_s2m.csr' start='0x4001000' end='0x4001040' type='altera_avalon_sgdma.csr' /><slave name='sgdma_m2s.csr' start='0x4001040' end='0x4001080' type='altera_avalon_sgdma.csr' /><slave name='histogram_calculation.params' start='0x4001080' end='0x4001090' type='histogram_calculation.params' /><slave name='pll.pll_slave' start='0x4001090' end='0x40010A0' type='altpll.pll_slave' /><slave name='jtag_uart.avalon_jtag_slave' start='0x40010A0' end='0x40010A8' type='altera_avalon_jtag_uart.avalon_jtag_slave' /></address-map>]]></parameter>
+  <parameter name="dataSlaveMapParam"><![CDATA[<address-map><slave name='sdram.s1' start='0x2000000' end='0x4000000' type='altera_avalon_new_sdram_controller.s1' /><slave name='nios2.debug_mem_slave' start='0x4000800' end='0x4001000' type='altera_nios2_gen2.debug_mem_slave' /><slave name='performance_counter.control_slave' start='0x4001000' end='0x4001040' type='altera_avalon_performance_counter.control_slave' /><slave name='sgdma_s2m.csr' start='0x4001040' end='0x4001080' type='altera_avalon_sgdma.csr' /><slave name='sgdma_m2s.csr' start='0x4001080' end='0x40010C0' type='altera_avalon_sgdma.csr' /><slave name='pll.pll_slave' start='0x40010C0' end='0x40010D0' type='altpll.pll_slave' /><slave name='histogram_calculation.params' start='0x40010D0' end='0x40010E0' type='histogram_calculation.params' /><slave name='jtag_uart.avalon_jtag_slave' start='0x40010E0' end='0x40010E8' type='altera_avalon_jtag_uart.avalon_jtag_slave' /></address-map>]]></parameter>
   <parameter name="data_master_high_performance_paddr_base" value="0" />
   <parameter name="data_master_high_performance_paddr_size" value="0" />
   <parameter name="data_master_paddr_base" value="0" />
@@ -369,6 +385,13 @@
   <parameter name="tmr_enabled" value="false" />
   <parameter name="tracefilename" value="" />
   <parameter name="userDefinedSettings" value="" />
+ </module>
+ <module
+   name="performance_counter"
+   kind="altera_avalon_performance_counter"
+   version="17.1"
+   enabled="1">
+  <parameter name="numberOfSections" value="3" />
  </module>
  <module name="pll" kind="altpll" version="17.1" enabled="1">
   <parameter name="AUTO_DEVICE_FAMILY" value="Cyclone IV E" />
@@ -614,7 +637,16 @@
    start="nios2.data_master"
    end="jtag_uart.avalon_jtag_slave">
   <parameter name="arbitrationPriority" value="1" />
-  <parameter name="baseAddress" value="0x040010a0" />
+  <parameter name="baseAddress" value="0x040010e0" />
+  <parameter name="defaultConnection" value="false" />
+ </connection>
+ <connection
+   kind="avalon"
+   version="17.1"
+   start="nios2.data_master"
+   end="performance_counter.control_slave">
+  <parameter name="arbitrationPriority" value="1" />
+  <parameter name="baseAddress" value="0x04001000" />
   <parameter name="defaultConnection" value="false" />
  </connection>
  <connection
@@ -623,7 +655,7 @@
    start="nios2.data_master"
    end="sgdma_m2s.csr">
   <parameter name="arbitrationPriority" value="1" />
-  <parameter name="baseAddress" value="0x04001040" />
+  <parameter name="baseAddress" value="0x04001080" />
   <parameter name="defaultConnection" value="false" />
  </connection>
  <connection
@@ -632,7 +664,7 @@
    start="nios2.data_master"
    end="sgdma_s2m.csr">
   <parameter name="arbitrationPriority" value="1" />
-  <parameter name="baseAddress" value="0x04001000" />
+  <parameter name="baseAddress" value="0x04001040" />
   <parameter name="defaultConnection" value="false" />
  </connection>
  <connection
@@ -650,7 +682,7 @@
    start="nios2.data_master"
    end="histogram_calculation.params">
   <parameter name="arbitrationPriority" value="1" />
-  <parameter name="baseAddress" value="0x04001080" />
+  <parameter name="baseAddress" value="0x040010d0" />
   <parameter name="defaultConnection" value="false" />
  </connection>
  <connection
@@ -659,7 +691,7 @@
    start="nios2.data_master"
    end="pll.pll_slave">
   <parameter name="arbitrationPriority" value="1" />
-  <parameter name="baseAddress" value="0x04001090" />
+  <parameter name="baseAddress" value="0x040010c0" />
   <parameter name="defaultConnection" value="false" />
  </connection>
  <connection kind="avalon" version="17.1" start="nios2.data_master" end="sdram.s1">
@@ -750,6 +782,11 @@
    kind="clock"
    version="17.1"
    start="pll.c0"
+   end="performance_counter.clk" />
+ <connection
+   kind="clock"
+   version="17.1"
+   start="pll.c0"
    end="histogram_calculation.clock" />
  <connection
    kind="clock"
@@ -803,6 +840,11 @@
  <connection
    kind="reset"
    version="17.1"
+   start="clk_0.clk_reset"
+   end="performance_counter.reset" />
+ <connection
+   kind="reset"
+   version="17.1"
    start="nios2.debug_reset_request"
    end="pll.inclk_interface_reset" />
  <connection
@@ -835,6 +877,11 @@
    version="17.1"
    start="nios2.debug_reset_request"
    end="histogram_calculation.reset" />
+ <connection
+   kind="reset"
+   version="17.1"
+   start="nios2.debug_reset_request"
+   end="performance_counter.reset" />
  <interconnectRequirement for="$system" name="qsys_mm.clockCrossingAdapter" value="HANDSHAKE" />
  <interconnectRequirement for="$system" name="qsys_mm.enableEccProtection" value="FALSE" />
  <interconnectRequirement for="$system" name="qsys_mm.insertDefaultSlave" value="FALSE" />
