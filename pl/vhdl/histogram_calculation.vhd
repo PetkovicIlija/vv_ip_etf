@@ -276,17 +276,23 @@ begin
                                     reg_wr_en_i <= '0';
                                     asi_in_ready <= '1';
                                     ram_data_counter <= ram_data_counter + 1;
-                                    if(ram_data_counter = unsigned(configuration_register) - 1) then
-                                        send  <= '1';
-                                        status_register(END_CALC) <= '1';
-                                        asi_in_ready <= '0';
-                                    end if;
+                                    --if(ram_data_counter = unsigned(configuration_register) - 1) then
+                                    --    send  <= '1';
+                                    --    status_register(END_CALC) <= '1';
+                                    --    asi_in_ready <= '0';
+                                    --end if;
                             
                             end case;
                     
-                    end if;        
-                    
-                end if; 
+                    end if; 
+
+						  if(asi_in_eop = '1') then
+								 send  <= '1';
+								 status_register(END_CALC) <= '1';
+								 asi_in_ready <= '0';
+						  end if;					
+				  
+					 end if; 
                 
                 if(send = '1' and clear = '0') then
                 
@@ -322,6 +328,8 @@ begin
                     end if;
                     
                     if(counter_out = NUMBER_OF_HISTOGRAM_ELEMENT + 2) then
+						  --asi_in_eop
+						  --if(asi_in_eop = '1') then
                         send  <= '0';
                         clear <= '1';
                         aso_out_valid <= '0';
@@ -334,7 +342,7 @@ begin
                 
                 if(clear = '1') then
                 
-                    reg_wr_addr_i <= std_logic_vector(counter_out(RAM_ADDRESS_WIDTH - 1 downto 0));
+                    reg_wr_addr_i <= std_logic_vector(counter_clear(RAM_ADDRESS_WIDTH - 1 downto 0));
                     reg_wr_data_i <= (others => '0');
                 
                     if(written_out = "00") then
@@ -361,9 +369,18 @@ begin
                         status_register(CALCULATING) <= '0';
                         status_register(END_CALC) <= '0';
                         status_register(SENDING) <= '0';
+								--configuration_register <= (others => '0');
+								--control_register <= (others => '0');
                         control_register <= (others => '0');
                         written_out <= (others => '0');
                         counter_clear <= (others => '0');
+								ram_data_counter <= (others => '0');
+								reg_wr_addr_i <= (others => '0');
+								reg_wr_data_i <= (others => '0');
+								reg_wr_en_i <= '0';
+								reg_rd_addr_i <= (others => '0');
+								reg_rd_en_i <= '0';
+								counter_out <= (others => '0');
                     end if;
                
                 end if;       
