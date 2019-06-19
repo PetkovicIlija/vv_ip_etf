@@ -9,28 +9,12 @@
    categories="System" />
  <parameter name="bonusData"><![CDATA[bonusData 
 {
-   element clk_0
+   element clk_50MHz
    {
       datum _sortIndex
       {
-         value = "0";
+         value = "1";
          type = "int";
-      }
-   }
-   element histogram_calculation
-   {
-      datum _sortIndex
-      {
-         value = "7";
-         type = "int";
-      }
-   }
-   element histogram_calculation.params
-   {
-      datum baseAddress
-      {
-         value = "67113168";
-         type = "String";
       }
    }
    element jtag_uart
@@ -49,11 +33,32 @@
          type = "String";
       }
    }
-   element nios2
+   element mapping_intensity
    {
       datum _sortIndex
       {
-         value = "3";
+         value = "8";
+         type = "int";
+      }
+   }
+   element mapping_intensity.params
+   {
+      datum baseAddress
+      {
+         value = "67113152";
+         type = "String";
+      }
+   }
+   element nios2
+   {
+      datum _originalDeviceFamily
+      {
+         value = "Cyclone IV E";
+         type = "String";
+      }
+      datum _sortIndex
+      {
+         value = "0";
          type = "int";
       }
    }
@@ -65,27 +70,11 @@
          type = "String";
       }
    }
-   element performance_counter
-   {
-      datum _sortIndex
-      {
-         value = "8";
-         type = "int";
-      }
-   }
-   element performance_counter.control_slave
-   {
-      datum baseAddress
-      {
-         value = "67112960";
-         type = "String";
-      }
-   }
    element pll
    {
       datum _sortIndex
       {
-         value = "1";
+         value = "2";
          type = "int";
       }
    }
@@ -93,7 +82,7 @@
    {
       datum baseAddress
       {
-         value = "67113152";
+         value = "67113168";
          type = "String";
       }
    }
@@ -101,7 +90,7 @@
    {
       datum _sortIndex
       {
-         value = "2";
+         value = "3";
          type = "int";
       }
    }
@@ -126,6 +115,22 @@
       datum baseAddress
       {
          value = "67113088";
+         type = "String";
+      }
+   }
+   element sgdma_m2s_conf
+   {
+      datum _sortIndex
+      {
+         value = "7";
+         type = "int";
+      }
+   }
+   element sgdma_m2s_conf.csr
+   {
+      datum baseAddress
+      {
+         value = "67112960";
          type = "String";
       }
    }
@@ -159,35 +164,22 @@
  <parameter name="hideFromIPCatalog" value="false" />
  <parameter name="lockedInterfaceDefinition" value="" />
  <parameter name="maxAdditionalLatency" value="1" />
- <parameter name="projectName">histogram_calculation_dma.qpf</parameter>
+ <parameter name="projectName">mapping_intensity_dma.qpf</parameter>
  <parameter name="sopcBorderPoints" value="false" />
  <parameter name="systemHash" value="0" />
  <parameter name="testBenchDutName" value="" />
  <parameter name="timeStamp" value="0" />
  <parameter name="useTestBenchNamingPattern" value="false" />
  <instanceScript></instanceScript>
- <interface name="clk" internal="clk_0.clk_in" type="clock" dir="end" />
- <interface name="reset" internal="clk_0.clk_in_reset" type="reset" dir="end" />
+ <interface name="clk" internal="clk_50MHz.clk_in" type="clock" dir="end" />
+ <interface name="reset" internal="clk_50MHz.clk_in_reset" type="reset" dir="end" />
  <interface name="sdram" internal="sdram.wire" type="conduit" dir="end" />
  <interface name="sdram_clk" internal="pll.c1" type="clock" dir="start" />
- <module name="clk_0" kind="clock_source" version="17.1" enabled="1">
+ <module name="clk_50MHz" kind="clock_source" version="17.1" enabled="1">
   <parameter name="clockFrequency" value="50000000" />
   <parameter name="clockFrequencyKnown" value="true" />
   <parameter name="inputClockFrequency" value="0" />
   <parameter name="resetSynchronousEdges" value="NONE" />
- </module>
- <module
-   name="histogram_calculation"
-   kind="histogram_calculation"
-   version="1.0"
-   enabled="1">
-  <parameter name="CONTROL_REGISTER_WIDTH" value="8" />
-  <parameter name="INPUT_BUS_WIDTH" value="8" />
-  <parameter name="MAX_NUMBER_OF_PROCESSING_DATA" value="1000000" />
-  <parameter name="NUMBER_OF_HISTOGRAM_ELEMENT" value="256" />
-  <parameter name="OUTPUT_BUS_WIDTH" value="32" />
-  <parameter name="PARAMETER_BUS_WIDTH" value="32" />
-  <parameter name="STATUS_REGISTER_WIDTH" value="8" />
  </module>
  <module
    name="jtag_uart"
@@ -207,6 +199,19 @@
   <parameter name="useRelativePathForSimFile" value="false" />
   <parameter name="writeBufferDepth" value="64" />
   <parameter name="writeIRQThreshold" value="8" />
+ </module>
+ <module
+   name="mapping_intensity"
+   kind="mapping_intensity"
+   version="1.0"
+   enabled="1">
+  <parameter name="CONTROL_REGISTER_WIDTH" value="8" />
+  <parameter name="INPUT_BUS_WIDTH" value="8" />
+  <parameter name="MAX_NUMBER_OF_PROCESSING_DATA" value="1000000" />
+  <parameter name="NUMBER_OF_HISTOGRAM_ELEMENT" value="256" />
+  <parameter name="OUTPUT_BUS_WIDTH" value="8" />
+  <parameter name="PARAMETER_BUS_WIDTH" value="32" />
+  <parameter name="STATUS_REGISTER_WIDTH" value="8" />
  </module>
  <module name="nios2" kind="altera_nios2_gen2" version="17.1" enabled="1">
   <parameter name="AUTO_CLK_CLOCK_DOMAIN" value="5" />
@@ -228,7 +233,7 @@
   <parameter name="dataAddrWidth" value="27" />
   <parameter name="dataMasterHighPerformanceAddrWidth" value="1" />
   <parameter name="dataMasterHighPerformanceMapParam" value="" />
-  <parameter name="dataSlaveMapParam"><![CDATA[<address-map><slave name='sdram.s1' start='0x2000000' end='0x4000000' type='altera_avalon_new_sdram_controller.s1' /><slave name='nios2.debug_mem_slave' start='0x4000800' end='0x4001000' type='altera_nios2_gen2.debug_mem_slave' /><slave name='performance_counter.control_slave' start='0x4001000' end='0x4001040' type='altera_avalon_performance_counter.control_slave' /><slave name='sgdma_s2m.csr' start='0x4001040' end='0x4001080' type='altera_avalon_sgdma.csr' /><slave name='sgdma_m2s.csr' start='0x4001080' end='0x40010C0' type='altera_avalon_sgdma.csr' /><slave name='pll.pll_slave' start='0x40010C0' end='0x40010D0' type='altpll.pll_slave' /><slave name='histogram_calculation.params' start='0x40010D0' end='0x40010E0' type='histogram_calculation.params' /><slave name='jtag_uart.avalon_jtag_slave' start='0x40010E0' end='0x40010E8' type='altera_avalon_jtag_uart.avalon_jtag_slave' /></address-map>]]></parameter>
+  <parameter name="dataSlaveMapParam"><![CDATA[<address-map><slave name='sdram.s1' start='0x2000000' end='0x4000000' type='altera_avalon_new_sdram_controller.s1' /><slave name='nios2.debug_mem_slave' start='0x4000800' end='0x4001000' type='altera_nios2_gen2.debug_mem_slave' /><slave name='sgdma_m2s_conf.csr' start='0x4001000' end='0x4001040' type='altera_avalon_sgdma.csr' /><slave name='sgdma_s2m.csr' start='0x4001040' end='0x4001080' type='altera_avalon_sgdma.csr' /><slave name='sgdma_m2s.csr' start='0x4001080' end='0x40010C0' type='altera_avalon_sgdma.csr' /><slave name='mapping_intensity.params' start='0x40010C0' end='0x40010D0' type='mapping_intensity.params' /><slave name='pll.pll_slave' start='0x40010D0' end='0x40010E0' type='altpll.pll_slave' /><slave name='jtag_uart.avalon_jtag_slave' start='0x40010E0' end='0x40010E8' type='altera_avalon_jtag_uart.avalon_jtag_slave' /></address-map>]]></parameter>
   <parameter name="data_master_high_performance_paddr_base" value="0" />
   <parameter name="data_master_high_performance_paddr_size" value="0" />
   <parameter name="data_master_paddr_base" value="0" />
@@ -274,7 +279,7 @@
   <parameter name="instruction_master_high_performance_paddr_size" value="0" />
   <parameter name="instruction_master_paddr_base" value="0" />
   <parameter name="instruction_master_paddr_size" value="0" />
-  <parameter name="internalIrqMaskSystemInfo" value="7" />
+  <parameter name="internalIrqMaskSystemInfo" value="15" />
   <parameter name="io_regionbase" value="0" />
   <parameter name="io_regionsize" value="0" />
   <parameter name="master_addr_map" value="false" />
@@ -386,13 +391,6 @@
   <parameter name="tracefilename" value="" />
   <parameter name="userDefinedSettings" value="" />
  </module>
- <module
-   name="performance_counter"
-   kind="altera_avalon_performance_counter"
-   version="17.1"
-   enabled="1">
-  <parameter name="numberOfSections" value="3" />
- </module>
  <module name="pll" kind="altpll" version="17.1" enabled="1">
   <parameter name="AUTO_DEVICE_FAMILY" value="Cyclone IV E" />
   <parameter name="AUTO_INCLK_INTERFACE_CLOCK_RATE" value="50000000" />
@@ -471,7 +469,7 @@
   <parameter name="HIDDEN_IS_FIRST_EDIT" value="0" />
   <parameter name="HIDDEN_IS_NUMERIC">IN#WIDTH_CLOCK 1 IN#CLK0_DUTY_CYCLE 1 IN#PLL_TARGET_HARCOPY_CHECK 1 IN#CLK1_MULTIPLY_BY 1 IN#SWITCHOVER_COUNT_EDIT 1 IN#INCLK0_INPUT_FREQUENCY 1 IN#PLL_LVDS_PLL_CHECK 1 IN#PLL_AUTOPLL_CHECK 1 IN#PLL_FASTPLL_CHECK 1 IN#CLK1_DUTY_CYCLE 1 IN#PLL_ENHPLL_CHECK 1 IN#DIV_FACTOR1 1 IN#DIV_FACTOR0 1 IN#LVDS_MODE_DATA_RATE_DIRTY 1 IN#GLOCK_COUNTER_EDIT 1 IN#CLK0_DIVIDE_BY 1 IN#MULT_FACTOR1 1 IN#MULT_FACTOR0 1 IN#CLK0_MULTIPLY_BY 1 IN#USE_MIL_SPEED_GRADE 1 IN#CLK1_DIVIDE_BY 1</parameter>
   <parameter name="HIDDEN_MF_PORTS">MF#areset 1 MF#clk 1 MF#locked 1 MF#inclk 1</parameter>
-  <parameter name="HIDDEN_PRIVATES">PT#GLOCKED_FEATURE_ENABLED 0 PT#SPREAD_FEATURE_ENABLED 0 PT#BANDWIDTH_FREQ_UNIT MHz PT#CUR_DEDICATED_CLK c0 PT#INCLK0_FREQ_EDIT 50.000 PT#BANDWIDTH_PRESET Low PT#PLL_LVDS_PLL_CHECK 0 PT#BANDWIDTH_USE_PRESET 0 PT#AVALON_USE_SEPARATE_SYSCLK NO PT#PLL_ENHPLL_CHECK 0 PT#OUTPUT_FREQ_UNIT1 MHz PT#OUTPUT_FREQ_UNIT0 MHz PT#PHASE_RECONFIG_FEATURE_ENABLED 1 PT#CREATE_CLKBAD_CHECK 0 PT#CLKSWITCH_CHECK 0 PT#INCLK1_FREQ_EDIT 100.000 PT#NORMAL_MODE_RADIO 1 PT#SRC_SYNCH_COMP_RADIO 0 PT#PLL_ARESET_CHECK 0 PT#LONG_SCAN_RADIO 1 PT#SCAN_FEATURE_ENABLED 1 PT#PHASE_RECONFIG_INPUTS_CHECK 0 PT#USE_CLK1 1 PT#USE_CLK0 1 PT#PRIMARY_CLK_COMBO inclk0 PT#BANDWIDTH 1.000 PT#GLOCKED_COUNTER_EDIT_CHANGED 1 PT#PLL_FASTPLL_CHECK 0 PT#SPREAD_FREQ_UNIT KHz PT#PLL_AUTOPLL_CHECK 1 PT#LVDS_PHASE_SHIFT_UNIT1 deg PT#LVDS_PHASE_SHIFT_UNIT0 deg PT#OUTPUT_FREQ_MODE1 1 PT#SWITCHOVER_FEATURE_ENABLED 0 PT#MIG_DEVICE_SPEED_GRADE Any PT#OUTPUT_FREQ_MODE0 0 PT#BANDWIDTH_FEATURE_ENABLED 1 PT#INCLK0_FREQ_UNIT_COMBO MHz PT#ZERO_DELAY_RADIO 0 PT#OUTPUT_FREQ1 50.00000000 PT#OUTPUT_FREQ0 50.00000000 PT#SHORT_SCAN_RADIO 0 PT#LVDS_MODE_DATA_RATE_DIRTY 0 PT#CUR_FBIN_CLK c0 PT#PLL_ADVANCED_PARAM_CHECK 0 PT#CLKBAD_SWITCHOVER_CHECK 0 PT#PHASE_SHIFT_STEP_ENABLED_CHECK 0 PT#DEVICE_SPEED_GRADE 6 PT#PLL_FBMIMIC_CHECK 0 PT#LVDS_MODE_DATA_RATE {Not Available} PT#LOCKED_OUTPUT_CHECK 0 PT#SPREAD_PERCENT 0.000 PT#PHASE_SHIFT1 0.00000000 PT#PHASE_SHIFT0 3000.00000000 PT#DIV_FACTOR1 1 PT#DIV_FACTOR0 1 PT#CNX_NO_COMPENSATE_RADIO 0 PT#USE_CLKENA1 0 PT#USE_CLKENA0 0 PT#CREATE_INCLK1_CHECK 0 PT#GLOCK_COUNTER_EDIT 1048575 PT#INCLK1_FREQ_UNIT_COMBO MHz PT#EFF_OUTPUT_FREQ_VALUE1 50.000000 PT#EFF_OUTPUT_FREQ_VALUE0 50.000000 PT#SPREAD_FREQ 50.000 PT#USE_MIL_SPEED_GRADE 0 PT#EXPLICIT_SWITCHOVER_COUNTER 0 PT#STICKY_CLK1 1 PT#STICKY_CLK0 1 PT#EXT_FEEDBACK_RADIO 0 PT#MIRROR_CLK1 0 PT#MIRROR_CLK0 0 PT#SWITCHOVER_COUNT_EDIT 1 PT#SELF_RESET_LOCK_LOSS 0 PT#PLL_PFDENA_CHECK 0 PT#INT_FEEDBACK__MODE_RADIO 1 PT#INCLK1_FREQ_EDIT_CHANGED 1 PT#CLKLOSS_CHECK 0 PT#SYNTH_WRAPPER_GEN_POSTFIX 1 PT#PHASE_SHIFT_UNIT1 deg PT#PHASE_SHIFT_UNIT0 ps PT#BANDWIDTH_USE_AUTO 1 PT#HAS_MANUAL_SWITCHOVER 1 PT#MULT_FACTOR1 1 PT#MULT_FACTOR0 1 PT#SPREAD_USE 0 PT#GLOCKED_MODE_CHECK 0 PT#SACN_INPUTS_CHECK 0 PT#DUTY_CYCLE1 50.00000000 PT#INTENDED_DEVICE_FAMILY {Cyclone IV E} PT#DUTY_CYCLE0 50.00000000 PT#PLL_TARGET_HARCOPY_CHECK 0 PT#INCLK1_FREQ_UNIT_CHANGED 1 PT#RECONFIG_FILE ALTPLL1558274638478033.mif PT#ACTIVECLK_CHECK 0</parameter>
+  <parameter name="HIDDEN_PRIVATES">PT#GLOCKED_FEATURE_ENABLED 0 PT#SPREAD_FEATURE_ENABLED 0 PT#BANDWIDTH_FREQ_UNIT MHz PT#CUR_DEDICATED_CLK c0 PT#INCLK0_FREQ_EDIT 50.000 PT#BANDWIDTH_PRESET Low PT#PLL_LVDS_PLL_CHECK 0 PT#BANDWIDTH_USE_PRESET 0 PT#AVALON_USE_SEPARATE_SYSCLK NO PT#PLL_ENHPLL_CHECK 0 PT#OUTPUT_FREQ_UNIT1 MHz PT#OUTPUT_FREQ_UNIT0 MHz PT#PHASE_RECONFIG_FEATURE_ENABLED 1 PT#CREATE_CLKBAD_CHECK 0 PT#CLKSWITCH_CHECK 0 PT#INCLK1_FREQ_EDIT 100.000 PT#NORMAL_MODE_RADIO 1 PT#SRC_SYNCH_COMP_RADIO 0 PT#PLL_ARESET_CHECK 0 PT#LONG_SCAN_RADIO 1 PT#SCAN_FEATURE_ENABLED 1 PT#PHASE_RECONFIG_INPUTS_CHECK 0 PT#USE_CLK1 1 PT#USE_CLK0 1 PT#PRIMARY_CLK_COMBO inclk0 PT#BANDWIDTH 1.000 PT#GLOCKED_COUNTER_EDIT_CHANGED 1 PT#PLL_FASTPLL_CHECK 0 PT#SPREAD_FREQ_UNIT KHz PT#PLL_AUTOPLL_CHECK 1 PT#LVDS_PHASE_SHIFT_UNIT1 deg PT#LVDS_PHASE_SHIFT_UNIT0 deg PT#OUTPUT_FREQ_MODE1 1 PT#SWITCHOVER_FEATURE_ENABLED 0 PT#MIG_DEVICE_SPEED_GRADE Any PT#OUTPUT_FREQ_MODE0 1 PT#BANDWIDTH_FEATURE_ENABLED 1 PT#INCLK0_FREQ_UNIT_COMBO MHz PT#ZERO_DELAY_RADIO 0 PT#OUTPUT_FREQ1 50.00000000 PT#OUTPUT_FREQ0 50.00000000 PT#SHORT_SCAN_RADIO 0 PT#LVDS_MODE_DATA_RATE_DIRTY 0 PT#CUR_FBIN_CLK c0 PT#PLL_ADVANCED_PARAM_CHECK 0 PT#CLKBAD_SWITCHOVER_CHECK 0 PT#PHASE_SHIFT_STEP_ENABLED_CHECK 0 PT#DEVICE_SPEED_GRADE 6 PT#PLL_FBMIMIC_CHECK 0 PT#LVDS_MODE_DATA_RATE {Not Available} PT#LOCKED_OUTPUT_CHECK 0 PT#SPREAD_PERCENT 0.000 PT#PHASE_SHIFT1 0.00000000 PT#PHASE_SHIFT0 3000.00000000 PT#DIV_FACTOR1 1 PT#DIV_FACTOR0 1 PT#CNX_NO_COMPENSATE_RADIO 0 PT#USE_CLKENA1 0 PT#USE_CLKENA0 0 PT#CREATE_INCLK1_CHECK 0 PT#GLOCK_COUNTER_EDIT 1048575 PT#INCLK1_FREQ_UNIT_COMBO MHz PT#EFF_OUTPUT_FREQ_VALUE1 50.000000 PT#EFF_OUTPUT_FREQ_VALUE0 50.000000 PT#SPREAD_FREQ 50.000 PT#USE_MIL_SPEED_GRADE 0 PT#EXPLICIT_SWITCHOVER_COUNTER 0 PT#STICKY_CLK1 1 PT#STICKY_CLK0 1 PT#EXT_FEEDBACK_RADIO 0 PT#MIRROR_CLK1 0 PT#MIRROR_CLK0 0 PT#SWITCHOVER_COUNT_EDIT 1 PT#SELF_RESET_LOCK_LOSS 0 PT#PLL_PFDENA_CHECK 0 PT#INT_FEEDBACK__MODE_RADIO 1 PT#INCLK1_FREQ_EDIT_CHANGED 1 PT#CLKLOSS_CHECK 0 PT#SYNTH_WRAPPER_GEN_POSTFIX 1 PT#PHASE_SHIFT_UNIT1 deg PT#PHASE_SHIFT_UNIT0 ps PT#BANDWIDTH_USE_AUTO 1 PT#HAS_MANUAL_SWITCHOVER 1 PT#MULT_FACTOR1 1 PT#MULT_FACTOR0 1 PT#SPREAD_USE 0 PT#GLOCKED_MODE_CHECK 0 PT#SACN_INPUTS_CHECK 0 PT#DUTY_CYCLE1 50.00000000 PT#INTENDED_DEVICE_FAMILY {Cyclone IV E} PT#DUTY_CYCLE0 50.00000000 PT#PLL_TARGET_HARCOPY_CHECK 0 PT#INCLK1_FREQ_UNIT_CHANGED 1 PT#RECONFIG_FILE ALTPLL1559828603959858.mif PT#ACTIVECLK_CHECK 0</parameter>
   <parameter name="HIDDEN_USED_PORTS">UP#locked used UP#c1 used UP#c0 used UP#areset used UP#inclk0 used</parameter>
   <parameter name="INCLK0_INPUT_FREQUENCY" value="20000" />
   <parameter name="INCLK1_INPUT_FREQUENCY" value="" />
@@ -611,20 +609,41 @@
   <parameter name="writeBurstcountWidth" value="4" />
  </module>
  <module
-   name="sgdma_s2m"
+   name="sgdma_m2s_conf"
    kind="altera_avalon_sgdma"
    version="17.1"
    enabled="1">
   <parameter name="addressWidth" value="32" />
   <parameter name="alwaysDoMaxBurst" value="true" />
-  <parameter name="avalonMMByteReorderMode" value="1" />
+  <parameter name="avalonMMByteReorderMode" value="0" />
   <parameter name="dataTransferFIFODepth" value="2" />
   <parameter name="deviceFamilyString" value="Cyclone IV E" />
   <parameter name="enableBurstTransfers" value="false" />
   <parameter name="enableDescriptorReadMasterBurst" value="false" />
   <parameter name="enableUnalignedTransfers" value="false" />
   <parameter name="internalFIFODepth" value="2" />
-  <parameter name="readBlockDataWidth" value="32" />
+  <parameter name="readBlockDataWidth" value="8" />
+  <parameter name="readBurstcountWidth" value="4" />
+  <parameter name="sinkErrorWidth" value="0" />
+  <parameter name="sourceErrorWidth" value="0" />
+  <parameter name="transferMode" value="MEMORY_TO_STREAM" />
+  <parameter name="writeBurstcountWidth" value="4" />
+ </module>
+ <module
+   name="sgdma_s2m"
+   kind="altera_avalon_sgdma"
+   version="17.1"
+   enabled="1">
+  <parameter name="addressWidth" value="32" />
+  <parameter name="alwaysDoMaxBurst" value="true" />
+  <parameter name="avalonMMByteReorderMode" value="0" />
+  <parameter name="dataTransferFIFODepth" value="2" />
+  <parameter name="deviceFamilyString" value="Cyclone IV E" />
+  <parameter name="enableBurstTransfers" value="false" />
+  <parameter name="enableDescriptorReadMasterBurst" value="false" />
+  <parameter name="enableUnalignedTransfers" value="false" />
+  <parameter name="internalFIFODepth" value="2" />
+  <parameter name="readBlockDataWidth" value="8" />
   <parameter name="readBurstcountWidth" value="4" />
   <parameter name="sinkErrorWidth" value="0" />
   <parameter name="sourceErrorWidth" value="0" />
@@ -638,15 +657,6 @@
    end="jtag_uart.avalon_jtag_slave">
   <parameter name="arbitrationPriority" value="1" />
   <parameter name="baseAddress" value="0x040010e0" />
-  <parameter name="defaultConnection" value="false" />
- </connection>
- <connection
-   kind="avalon"
-   version="17.1"
-   start="nios2.data_master"
-   end="performance_counter.control_slave">
-  <parameter name="arbitrationPriority" value="1" />
-  <parameter name="baseAddress" value="0x04001000" />
   <parameter name="defaultConnection" value="false" />
  </connection>
  <connection
@@ -671,6 +681,15 @@
    kind="avalon"
    version="17.1"
    start="nios2.data_master"
+   end="sgdma_m2s_conf.csr">
+  <parameter name="arbitrationPriority" value="1" />
+  <parameter name="baseAddress" value="0x04001000" />
+  <parameter name="defaultConnection" value="false" />
+ </connection>
+ <connection
+   kind="avalon"
+   version="17.1"
+   start="nios2.data_master"
    end="nios2.debug_mem_slave">
   <parameter name="arbitrationPriority" value="1" />
   <parameter name="baseAddress" value="0x04000800" />
@@ -680,9 +699,9 @@
    kind="avalon"
    version="17.1"
    start="nios2.data_master"
-   end="histogram_calculation.params">
+   end="mapping_intensity.params">
   <parameter name="arbitrationPriority" value="1" />
-  <parameter name="baseAddress" value="0x040010d0" />
+  <parameter name="baseAddress" value="0x040010c0" />
   <parameter name="defaultConnection" value="false" />
  </connection>
  <connection
@@ -691,7 +710,7 @@
    start="nios2.data_master"
    end="pll.pll_slave">
   <parameter name="arbitrationPriority" value="1" />
-  <parameter name="baseAddress" value="0x040010c0" />
+  <parameter name="baseAddress" value="0x040010d0" />
   <parameter name="defaultConnection" value="false" />
  </connection>
  <connection kind="avalon" version="17.1" start="nios2.data_master" end="sdram.s1">
@@ -720,6 +739,15 @@
  <connection
    kind="avalon"
    version="17.1"
+   start="sgdma_m2s_conf.descriptor_read"
+   end="sdram.s1">
+  <parameter name="arbitrationPriority" value="1" />
+  <parameter name="baseAddress" value="0x02000000" />
+  <parameter name="defaultConnection" value="false" />
+ </connection>
+ <connection
+   kind="avalon"
+   version="17.1"
    start="sgdma_m2s.descriptor_write"
    end="sdram.s1">
   <parameter name="arbitrationPriority" value="1" />
@@ -730,6 +758,15 @@
    kind="avalon"
    version="17.1"
    start="sgdma_s2m.descriptor_write"
+   end="sdram.s1">
+  <parameter name="arbitrationPriority" value="1" />
+  <parameter name="baseAddress" value="0x02000000" />
+  <parameter name="defaultConnection" value="false" />
+ </connection>
+ <connection
+   kind="avalon"
+   version="17.1"
+   start="sgdma_m2s_conf.descriptor_write"
    end="sdram.s1">
   <parameter name="arbitrationPriority" value="1" />
   <parameter name="baseAddress" value="0x02000000" />
@@ -758,6 +795,15 @@
   <parameter name="baseAddress" value="0x02000000" />
   <parameter name="defaultConnection" value="false" />
  </connection>
+ <connection
+   kind="avalon"
+   version="17.1"
+   start="sgdma_m2s_conf.m_read"
+   end="sdram.s1">
+  <parameter name="arbitrationPriority" value="1" />
+  <parameter name="baseAddress" value="0x02000000" />
+  <parameter name="defaultConnection" value="false" />
+ </connection>
  <connection kind="avalon" version="17.1" start="sgdma_s2m.m_write" end="sdram.s1">
   <parameter name="arbitrationPriority" value="1" />
   <parameter name="baseAddress" value="0x02000000" />
@@ -766,46 +812,54 @@
  <connection
    kind="avalon_streaming"
    version="17.1"
-   start="histogram_calculation.out"
+   start="sgdma_m2s.out"
+   end="mapping_intensity.in" />
+ <connection
+   kind="avalon_streaming"
+   version="17.1"
+   start="mapping_intensity.out"
    end="sgdma_s2m.in" />
  <connection
    kind="avalon_streaming"
    version="17.1"
-   start="sgdma_m2s.out"
-   end="histogram_calculation.in" />
+   start="sgdma_m2s_conf.out"
+   end="mapping_intensity.in_conf" />
  <connection kind="clock" version="17.1" start="pll.c0" end="sdram.clk" />
  <connection kind="clock" version="17.1" start="pll.c0" end="nios2.clk" />
  <connection kind="clock" version="17.1" start="pll.c0" end="jtag_uart.clk" />
  <connection kind="clock" version="17.1" start="pll.c0" end="sgdma_m2s.clk" />
  <connection kind="clock" version="17.1" start="pll.c0" end="sgdma_s2m.clk" />
+ <connection kind="clock" version="17.1" start="pll.c0" end="sgdma_m2s_conf.clk" />
  <connection
    kind="clock"
    version="17.1"
    start="pll.c0"
-   end="performance_counter.clk" />
+   end="mapping_intensity.clock" />
  <connection
    kind="clock"
    version="17.1"
-   start="pll.c0"
-   end="histogram_calculation.clock" />
- <connection
-   kind="clock"
-   version="17.1"
-   start="clk_0.clk"
+   start="clk_50MHz.clk"
    end="pll.inclk_interface" />
  <connection
    kind="interrupt"
    version="17.1"
    start="nios2.irq"
-   end="sgdma_m2s.csr_irq">
+   end="sgdma_s2m.csr_irq">
   <parameter name="irqNumber" value="1" />
  </connection>
  <connection
    kind="interrupt"
    version="17.1"
    start="nios2.irq"
-   end="sgdma_s2m.csr_irq">
+   end="sgdma_m2s.csr_irq">
   <parameter name="irqNumber" value="2" />
+ </connection>
+ <connection
+   kind="interrupt"
+   version="17.1"
+   start="nios2.irq"
+   end="sgdma_m2s_conf.csr_irq">
+  <parameter name="irqNumber" value="3" />
  </connection>
  <connection kind="interrupt" version="17.1" start="nios2.irq" end="jtag_uart.irq">
   <parameter name="irqNumber" value="0" />
@@ -813,35 +867,43 @@
  <connection
    kind="reset"
    version="17.1"
-   start="clk_0.clk_reset"
+   start="clk_50MHz.clk_reset"
    end="pll.inclk_interface_reset" />
- <connection kind="reset" version="17.1" start="clk_0.clk_reset" end="sdram.reset" />
- <connection kind="reset" version="17.1" start="clk_0.clk_reset" end="nios2.reset" />
  <connection
    kind="reset"
    version="17.1"
-   start="clk_0.clk_reset"
+   start="clk_50MHz.clk_reset"
    end="jtag_uart.reset" />
  <connection
    kind="reset"
    version="17.1"
-   start="clk_0.clk_reset"
+   start="clk_50MHz.clk_reset"
+   end="nios2.reset" />
+ <connection
+   kind="reset"
+   version="17.1"
+   start="clk_50MHz.clk_reset"
+   end="sdram.reset" />
+ <connection
+   kind="reset"
+   version="17.1"
+   start="clk_50MHz.clk_reset"
    end="sgdma_m2s.reset" />
  <connection
    kind="reset"
    version="17.1"
-   start="clk_0.clk_reset"
+   start="clk_50MHz.clk_reset"
    end="sgdma_s2m.reset" />
  <connection
    kind="reset"
    version="17.1"
-   start="clk_0.clk_reset"
-   end="histogram_calculation.reset" />
+   start="clk_50MHz.clk_reset"
+   end="sgdma_m2s_conf.reset" />
  <connection
    kind="reset"
    version="17.1"
-   start="clk_0.clk_reset"
-   end="performance_counter.reset" />
+   start="clk_50MHz.clk_reset"
+   end="mapping_intensity.reset" />
  <connection
    kind="reset"
    version="17.1"
@@ -851,7 +913,7 @@
    kind="reset"
    version="17.1"
    start="nios2.debug_reset_request"
-   end="sdram.reset" />
+   end="jtag_uart.reset" />
  <connection
    kind="reset"
    version="17.1"
@@ -861,7 +923,7 @@
    kind="reset"
    version="17.1"
    start="nios2.debug_reset_request"
-   end="jtag_uart.reset" />
+   end="sdram.reset" />
  <connection
    kind="reset"
    version="17.1"
@@ -876,12 +938,12 @@
    kind="reset"
    version="17.1"
    start="nios2.debug_reset_request"
-   end="histogram_calculation.reset" />
+   end="sgdma_m2s_conf.reset" />
  <connection
    kind="reset"
    version="17.1"
    start="nios2.debug_reset_request"
-   end="performance_counter.reset" />
+   end="mapping_intensity.reset" />
  <interconnectRequirement for="$system" name="qsys_mm.clockCrossingAdapter" value="HANDSHAKE" />
  <interconnectRequirement for="$system" name="qsys_mm.enableEccProtection" value="FALSE" />
  <interconnectRequirement for="$system" name="qsys_mm.insertDefaultSlave" value="FALSE" />
