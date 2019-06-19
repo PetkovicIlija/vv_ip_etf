@@ -13,7 +13,7 @@
 #include "stdlib.h"
 #include "string.h"
 #include "altera_hostfs.h"
-#include "altera_avalon_performance_counter.h"
+//#include "altera_avalon_performance_counter.h"
 #include "alt_types.h"
 #include "math.h"
 
@@ -23,7 +23,7 @@
 
 void hist(alt_u8* image,alt_u32 width, alt_u32 height, alt_u32 left_up_corner_x, alt_u32 left_up_corner_y, alt_u32 right_down_corner_x,alt_u32 right_down_corner_y, alt_u32** hist_value);
 
-void cumsum(alt_u32* hist, alt_u32 width, alt_u32 height, alt_u32** cuml);
+void cumsum(alt_u32* hist, alt_u32 width, alt_u32 height, alt_u8** cuml);
 
 
 #endif /* FUNCTIONS_H_ */
