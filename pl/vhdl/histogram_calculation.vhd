@@ -1,5 +1,4 @@
 ----------------------------------------------------------------------------------
--- Company: NovelIC
 -- Engineer: Ilija Petkovic
 -- 
 -- Create Date: 05/18/2019 01:17:55 PM
@@ -31,12 +30,19 @@ entity histogram_calculation is
 
     Generic(
     
+		  -- Width of input bus
         INPUT_BUS_WIDTH : integer := 8;
+		  -- Width of output bus
         OUTPUT_BUS_WIDTH : integer := 32;
+		  -- Width of parameter bus
         PARAMETER_BUS_WIDTH : integer := 32;
+		  -- Number of histogram element
         NUMBER_OF_HISTOGRAM_ELEMENT : integer := 256;
+		  -- Max number of data that can be read
         MAX_NUMBER_OF_PROCESSING_DATA : integer := 100000;
+		  -- Width of status register
         STATUS_REGISTER_WIDTH : integer := 8;
+		  -- Width of control register
         CONTROL_REGISTER_WIDTH : integer := 8
     );
 
@@ -110,10 +116,7 @@ architecture Behavioral of histogram_calculation is
     constant END_CLEAR : integer := 5;
     
     -- Control registers
-    constant START_CALC : integer := 0;
-    --constant STOP : integer := 1;
-    --constant START_SEND : integer := 2;
-    
+    constant START_CALC : integer := 0;  
     
     -- Signals
     
@@ -187,6 +190,7 @@ begin
     
         if(rising_edge(clk)) then
         
+				-- Reset values
             if(reset = '1') then
             
                 configuration_register <= (others => '0');
@@ -206,7 +210,6 @@ begin
                 written_out <= (others => '0');
                 read_out <= (others => '0');
                 aso_out_valid <= '0';
-                --aso_out_data <= (others => '0');
                 counter_clear <= (others => '0');
                 clear <= '0';
             
@@ -230,28 +233,28 @@ begin
                 if(status_register_strobe =  '1') then
                     avs_params_readdata(STATUS_REGISTER_WIDTH - 1 downto 0) <= status_register;    
                 end if;  
-                
-                --aso_out_data <= reg_rd_data_o; 
-                
+
+                -- Start processing
                 if(control_register(START_CALC) = '1' and status_register(CONFIGURED) = '1' and clear = '0') then
                 
                     asi_in_ready <= '1';
                 
+						  -- Data is valid and component not sending output data
                     if(asi_in_valid = '1' and send  = '0' and clear = '0' and read = "00") then       
                 
                         asi_in_ready <= '0';
                         
                         status_register(CALCULATING) <= '1';
                         
-								--if(read = "00") then
 								read <= "01";
-								--end if;
                         
+								-- Reading stored data
                         reg_rd_en_i <= '1';
                         reg_rd_addr_i <= asi_in_data;
                         
                     end if;                       
                             
+						  -- Delay for reading from RAM
                     if(read = "01") then 
                         
                             read <= "10"; 
@@ -260,32 +263,34 @@ begin
                             asi_in_ready <= '0';
                     end if;
                     
+						  -- Data is read from RAM
                     if(read = "10") then
                         
                             asi_in_ready <= '0';
                             reg_rd_en_i <= '0';
                             
+									 -- Writing new data(incremented read value for 1) in RAM
                             case(written) is
                             
+										  -- Writing data
                                 when("0") =>
                                     reg_wr_data_i <= std_logic_vector(unsigned(reg_rd_data_o) + 1);
                                     written <= (others => '1');
+										  -- Delay for writing
                                 when others =>
                                     read <= (others => '0');
                                     written <= (others => '0');
                                     reg_wr_en_i <= '0';
                                     asi_in_ready <= '1';
+												-- Incrementing datat counter
                                     ram_data_counter <= ram_data_counter + 1;
-                                    --if(ram_data_counter = unsigned(configuration_register) - 1) then
-                                    --    send  <= '1';
-                                    --    status_register(END_CALC) <= '1';
-                                    --    asi_in_ready <= '0';
-                                    --end if;
+
                             
                             end case;
                     
                     end if; 
 
+						  -- Last data is processsed
 						  if(asi_in_eop = '1') then
 								 send  <= '1';
 								 status_register(END_CALC) <= '1';
@@ -294,21 +299,23 @@ begin
 				  
 					 end if; 
                 
+					 -- Sending when all of data was read
                 if(send = '1' and clear = '0') then
                 
 						  if(counter_out < 2) then
-								--reg_rd_addr_i <= std_logic_vector(counter_out(RAM_ADDRESS_WIDTH - 1 downto 0) - 2);
-						  --else
 								reg_rd_addr_i <= (others => '0');
 						  end if;
                     
+						  -- Sending data
+						  -- Delay
                     if(read_out = "00") then
                         reg_rd_en_i <= '1';
                         read_out <= "01";
                     end if;
                                 
                     if(read_out = "01") then 
-                            read_out <= "10"; 
+                            read_out <= "10";
+									-- Inc data counter 
                             counter_out <= counter_out + 1;
                     end if;
                     
@@ -316,8 +323,10 @@ begin
                             
                             aso_out_valid <= '1';
                             
+									 -- DMA is ready to catch new data
                             if(aso_out_ready = '1') then
                             
+										  -- Inc data counter
                                 counter_out <= counter_out + 1;
 										  if(counter_out > 1) then
 												reg_rd_addr_i <= std_logic_vector(unsigned(reg_rd_addr_i) + 1);
@@ -327,9 +336,8 @@ begin
 
                     end if;
                     
+						  -- All data sent
                     if(counter_out = NUMBER_OF_HISTOGRAM_ELEMENT + 2) then
-						  --asi_in_eop
-						  --if(asi_in_eop = '1') then
                         send  <= '0';
                         clear <= '1';
                         aso_out_valid <= '0';
@@ -340,16 +348,19 @@ begin
                 
                 end if;
                 
+					 -- Reseting RAM
                 if(clear = '1') then
                 
                     reg_wr_addr_i <= std_logic_vector(counter_clear(RAM_ADDRESS_WIDTH - 1 downto 0));
                     reg_wr_data_i <= (others => '0');
                 
+						  -- Writing zeros in RAM
                     if(written_out = "00") then
                         reg_wr_en_i <= '1';
                         written_out <= "01";
                     end if;
                                 
+						  -- Delay for writing
                     if(written_out = "01") then 
                             written_out <= "10"; 
                             counter_clear <= counter_clear + 1;
@@ -361,6 +372,7 @@ begin
     
                     end if;
                     
+						  -- Reseting values
                     if(counter_clear = NUMBER_OF_HISTOGRAM_ELEMENT) then
                         clear <= '0';
                         status_register(END_CLEAR) <= '1';
@@ -369,8 +381,6 @@ begin
                         status_register(CALCULATING) <= '0';
                         status_register(END_CALC) <= '0';
                         status_register(SENDING) <= '0';
-								--configuration_register <= (others => '0');
-								--control_register <= (others => '0');
                         control_register <= (others => '0');
                         written_out <= (others => '0');
                         counter_clear <= (others => '0');

@@ -9,37 +9,45 @@ entity histogram_calculation_wrapper is
 
     Generic(
     
+		  -- Width of input data bus
         INPUT_BUS_WIDTH : integer := 32;
+		  -- Width of output data bus
         OUTPUT_BUS_WIDTH : integer := 32;
+		  -- Width of parameter bus
         PARAMETER_BUS_WIDTH : integer := 32;
+		  -- Number of histogram element
         NUMBER_OF_HISTOGRAM_ELEMENT : integer := 256;
+		  -- Maximum number of data fro processing
         MAX_NUMBER_OF_PROCESSING_DATA : integer := 100000;
+		  -- Width of status register 
         STATUS_REGISTER_WIDTH : integer := 8;
-		NUMBER_OF_HISTOGRAM_COMPONENT : integer := 4; -- should be INPUT_BUS_WIDTH*NUMBER_OF_HISTOGRAM_COMPONENT = 32
+		  -- Number of histogram component -- acceleration
+		  NUMBER_OF_HISTOGRAM_COMPONENT : integer := 4; -- should be INPUT_BUS_WIDTH*NUMBER_OF_HISTOGRAM_COMPONENT = 32
+		  -- Width of control register
         CONTROL_REGISTER_WIDTH : integer := 8
     );
 
 	Port (
-    reset                  : in  std_logic                     := '0';             --  reset.reset
-    avs_params_address     : in  std_logic_vector(1 downto 0)                     := "00";             -- params.address
-    avs_params_read        : in  std_logic                     := '0';             --       .read
-    avs_params_readdata    : out std_logic_vector(PARAMETER_BUS_WIDTH - 1 downto 0);                     --       .readdata
-    avs_params_write       : in  std_logic                     := '0';             --       .write
-    avs_params_writedata   : in  std_logic_vector(PARAMETER_BUS_WIDTH - 1 downto 0)  := (others => '0'); --       .writedata
-    avs_params_waitrequest : out std_logic;                                        --       .waitrequest
-    clk                    : in  std_logic                     := '0';             --  clock.clk
-    asi_in_data            : in  std_logic_vector(INPUT_BUS_WIDTH - 1 downto 0)  := (others => '0'); --     in.data
-    asi_in_ready           : out std_logic;                                        --       .ready
-    asi_in_valid           : in  std_logic                     := '0';             --       .valid
-    asi_in_sop             : in  std_logic                     := '0';             --       .startofpacket
-    asi_in_eop             : in  std_logic                     := '0';             --       .endofpacket
-	asi_in_empty          : in std_logic_vector(integer(ceil(log2(real(NUMBER_OF_HISTOGRAM_COMPONENT)))) - 1 downto 0);                                         --       .empty
-    aso_out_data           : out std_logic_vector(OUTPUT_BUS_WIDTH - 1 downto 0);                    --    out.data
-    aso_out_ready          : in  std_logic                     := '0';             --       .ready
-    aso_out_valid          : out std_logic;                                        --       .valid
-    aso_out_sop            : out std_logic;                                        --       .startofpacket
-    aso_out_eop            : out std_logic;                                        --       .endofpacket
-    aso_out_empty          : out std_logic_vector(integer(ceil(log2(real(NUMBER_OF_HISTOGRAM_COMPONENT)))) - 1 downto 0)                                         --       .empty
+		 reset                  : in  std_logic                     := '0';             --  reset.reset
+		 clk                    : in  std_logic                     := '0';             --  clock.clk
+		 avs_params_address     : in  std_logic_vector(1 downto 0)                     := "00";             -- params.address
+		 avs_params_read        : in  std_logic                     := '0';             --       .read
+		 avs_params_readdata    : out std_logic_vector(PARAMETER_BUS_WIDTH - 1 downto 0);                     --       .readdata
+		 avs_params_write       : in  std_logic                     := '0';             --       .write
+		 avs_params_writedata   : in  std_logic_vector(PARAMETER_BUS_WIDTH - 1 downto 0)  := (others => '0'); --       .writedata
+		 avs_params_waitrequest : out std_logic;                                        --       .waitrequest
+		 asi_in_data            : in  std_logic_vector(INPUT_BUS_WIDTH - 1 downto 0)  := (others => '0'); --     in.data
+		 asi_in_ready           : out std_logic;                                        --       .ready
+		 asi_in_valid           : in  std_logic                     := '0';             --       .valid
+		 asi_in_sop             : in  std_logic                     := '0';             --       .startofpacket
+		 asi_in_eop             : in  std_logic                     := '0';             --       .endofpacket
+		 asi_in_empty          : in std_logic_vector(integer(ceil(log2(real(NUMBER_OF_HISTOGRAM_COMPONENT)))) - 1 downto 0);                                         --       .empty
+		 aso_out_data           : out std_logic_vector(OUTPUT_BUS_WIDTH - 1 downto 0);                    --    out.data
+		 aso_out_ready          : in  std_logic                     := '0';             --       .ready
+		 aso_out_valid          : out std_logic;                                        --       .valid
+		 aso_out_sop            : out std_logic;                                        --       .startofpacket
+		 aso_out_eop            : out std_logic;                                        --       .endofpacket
+		 aso_out_empty          : out std_logic_vector(integer(ceil(log2(real(NUMBER_OF_HISTOGRAM_COMPONENT)))) - 1 downto 0)                                         --       .empty
     );
     
 end histogram_calculation_wrapper;
@@ -92,20 +100,24 @@ architecture Behavioral of histogram_calculation_wrapper is
 	type EMPTY is array (natural range <>) of std_logic_vector(integer(ceil(log2(real(NUMBER_OF_HISTOGRAM_COMPONENT)))) - 1 downto 0);
 	
 	-- Functions
+	
+	-- Functionn derived configuration values on equal(if that is possible) parts
 	impure function config_reg_cal(conf : std_logic_vector) return PARAMS_WRITE_DATA is
 		variable i : integer := 0;
 		variable result : PARAMS_WRITE_DATA(NUMBER_OF_HISTOGRAM_COMPONENT - 1 downto 0);		
 		variable tmp : std_logic_vector(integer(ceil(log2(real(NUMBER_OF_HISTOGRAM_COMPONENT)))) - 1 downto 0) := (others => '0');
-		--variable mod_tmp : integer range 0 to 2**(NUMBER_OF_HISTOGRAM_ELEMENT) - 1;
 		variable mod_tmp : unsigned(integer(ceil(log2(real(NUMBER_OF_HISTOGRAM_COMPONENT)))) - 1 downto 0) := (others => '0');
 	begin
 	
-		--mod_tmp := to_integer(unsigned(conf)) mod NUMBER_OF_HISTOGRAM_COMPONENT;
+		-- Rest of deriving VALUE OF CONFIGURATION REGISTER with NUMBER_OF_HISTOGRAM_COMPONENT
 		mod_tmp := unsigned(conf(integer(ceil(log2(real(NUMBER_OF_HISTOGRAM_COMPONENT)))) - 1 downto 0)); 
 	
+		-- Deriving
 		for i in NUMBER_OF_HISTOGRAM_COMPONENT - 1 downto 0 loop
 		
 			result(i) :=  tmp & conf(conf'length - 1 downto tmp'length);
+			-- if CONFIGURATION REGISTER mod NUMBER_OF_HISTOGRAM_COMPONENT is not 0
+			-- then some components will have more elements for processing than other
 			if((i > NUMBER_OF_HISTOGRAM_COMPONENT - 1 - to_integer(mod_tmp)) and mod_tmp > 0) then
 			
 				result(i) := std_logic_vector(unsigned(result(i)) + 1);
@@ -118,8 +130,9 @@ architecture Behavioral of histogram_calculation_wrapper is
 	
 	end function;
 	
-		-- Functions
-	impure function eq(regs : PARAMS_WRITE_DATA;conf : std_logic_vector) return PARAMS_WRITE_DATA is
+	-- Functions
+	-- std_logic_vector is stored in array
+	impure function eq(conf : std_logic_vector) return PARAMS_WRITE_DATA is
 		variable i : integer := 0;
 		variable result : PARAMS_WRITE_DATA(NUMBER_OF_HISTOGRAM_COMPONENT - 1 downto 0);		
 	begin
@@ -134,7 +147,8 @@ architecture Behavioral of histogram_calculation_wrapper is
 	
 	end function;
 	
-	
+	-- Avalon Bus has 32-bit width and empty signal with 2-bits
+	-- Function determines whist part of bus contents valid data
 	impure function valid_cal(valid : std_logic;empty : std_logic_vector) return std_logic_vector is
 		variable result : std_logic_vector(NUMBER_OF_HISTOGRAM_COMPONENT - 1 downto 0) := (others => '0');
 		variable i : integer := 0;
@@ -156,6 +170,7 @@ architecture Behavioral of histogram_calculation_wrapper is
 	
 	end function;
 	
+	-- Function for summing data in array
 	impure function sum(data : OUT_DATA) return std_logic_vector is
 		variable i : integer := 0;
 		variable result : std_logic_vector(OUTPUT_BUS_WIDTH - 1 downto 0) := (others => '0');
@@ -171,6 +186,7 @@ architecture Behavioral of histogram_calculation_wrapper is
 	
 	end function;
 	
+	-- And gata with more inputs
 	impure function valid_out(validd : std_logic_vector) return std_logic is
 		variable i : integer := 0;
 		variable result : std_logic := '0';
@@ -216,7 +232,6 @@ architecture Behavioral of histogram_calculation_wrapper is
 	 signal avs_params_read_tmp        : std_logic                     := '0';             --       .read
 	 signal avs_params_readdata_tmp    : std_logic_vector(PARAMETER_BUS_WIDTH - 1 downto 0);                     --       .readdata
 	 signal avs_params_write_tmp       : std_logic                     := '0';             --       .write
-	 --signal avs_params_writedata_tmp   : std_logic_vector(PARAMETER_BUS_WIDTH - 1 downto 0)  := (others => '0'); --       .writedata
 	 signal avs_params_waitrequest_tmp : std_logic;
 	 signal avs_params_writedata_tmp : PARAMS_WRITE_DATA(NUMBER_OF_HISTOGRAM_COMPONENT - 1 downto 0);
 	 
@@ -263,6 +278,7 @@ begin
 		
 			if(reset = '1') then
 			
+				-- Reset values
 				avs_params_address_tmp <= (others => '0');
 				avs_params_read_tmp <= '0';
 				avs_params_readdata_tmp <= (others => '0');
@@ -298,7 +314,7 @@ begin
 				   control_register <= avs_params_writedata(CONTROL_REGISTER_WIDTH - 1 downto 0); 
 					avs_params_address_tmp <= avs_params_address;
 					avs_params_write_tmp <= avs_params_write;
-					avs_params_writedata_tmp <= eq(avs_params_writedata_tmp, avs_params_writedata);
+					avs_params_writedata_tmp <= eq(avs_params_writedata); 
 				end if; 
 
 				-- Reading status
@@ -306,28 +322,34 @@ begin
 				  avs_params_readdata(STATUS_REGISTER_WIDTH - 1 downto 0) <= status_register;    
 				end if;
 				
+				-- Input data is valid ansd component has already configured
 				if(status_register(CONFIGURED) = '1' and asi_in_valid = '1' and tmp_ready = '1') then
 
+					-- Decision which part of bus carry valid data
 					case(asi_in_empty) is
 					
+						-- CONFIGURATION REGISTER mod NUMBER_OF_HISTOGRAM_COMPONENT = 0
 						when("00") =>
 							if(counter + 4 >= unsigned(configuration_register) - 1) then
 								asi_in_eop_tmp <= (others => '1');
 								counter <= (others => '0');
 							end if;
 							counter <= counter + 4;
+						-- CONFIGURATION REGISTER mod NUMBER_OF_HISTOGRAM_COMPONENT = 1
 						when("01") =>							
 							if(counter + 3 >= unsigned(configuration_register) - 1) then
 								asi_in_eop_tmp <= (others => '1');
 								counter <= (others => '0');
 							end if;
 							counter <= counter + 3;
+						-- CONFIGURATION REGISTER mod NUMBER_OF_HISTOGRAM_COMPONENT = 2
 						when("10") =>							
 							if(counter + 2 >= unsigned(configuration_register) - 1) then
 								asi_in_eop_tmp <= (others => '1');
 								counter <= (others => '0');
 							end if;
 							counter <= counter + 2;
+						-- CONFIGURATION REGISTER mod NUMBER_OF_HISTOGRAM_COMPONENT = 3
 						when others =>
 							if(counter + 1 >= unsigned(configuration_register) - 1) then
 								asi_in_eop_tmp <= (others => '1');
@@ -345,7 +367,7 @@ begin
 
 	end process;
 	
-	
+	-- Instantions of histogram components
 	label_Gen_histogram_calculation:
 		for i in NUMBER_OF_HISTOGRAM_COMPONENT downto 1 generate
 		
